@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core"
+	style="margin-left:0.0px;margin-right:0.0px" pageTitle="eHR APP 昆山"
+	xmlns:xe="http://www.ibm.com/xsp/coreex"
+	xmlns:xc="http://www.ibm.com/xsp/custom"
+	pageIcon="/favicon_foxlink.png">
+
+	<xp:this.resources>
+		<xp:script src="/xpg_CGIVariables.jss" clientSide="false"></xp:script>
+		<xp:script src="/csjs_useuicomm.js" clientSide="true"></xp:script>
+		<xp:styleSheet href="/Gweb.css"></xp:styleSheet>
+		<xp:script src="/ss_ree.jss" clientSide="false"></xp:script>
+		<xp:script src="/ssjs_index_pg.jss" clientSide="false"></xp:script>
+		<xp:linkResource rel="shortcut icon"
+			href="http://www.foxlink.com/web/wp-content/uploads/2017/02/favicon_foxlink.png">
+		</xp:linkResource>
+		<xp:linkResource rel="apple-touch-icon-precomposed"
+			href="http://www.foxlink.com/web/wp-content/uploads/2017/02/touchicon_foxlink.png">
+		</xp:linkResource>
+	</xp:this.resources>
+	<xp:this.beforePageLoad><![CDATA[#{javascript:var cgi = new CGIVariables();
+//denied_ip_access();	//不是ehr.foxlink.com.tw就轉址
+
+ss_ree();
+//print("1...")}]]></xp:this.beforePageLoad>
+
+
+
+	<xp:this.afterPageLoad><![CDATA[#{javascript://var cgi = new CGIVariables();
+}]]></xp:this.afterPageLoad>
+	<xp:this.attrs>
+		<xp:attr name="oncontextmenu"
+			value="window.event.returnValue=false">
+		</xp:attr>
+	</xp:this.attrs>
+	<xp:panel id="panel_sysy_Hidden">
+
+		ip：
+		<xp:inputText id="u_ip" readonly="true"
+			value="#{javascript:cgi.REMOTE_ADDR}">
+		</xp:inputText>
+		<xp:br></xp:br>
+		可申請的主機IP：
+		<xp:this.rendered><![CDATA[#{javascript:var v:Array = database.queryAccessRoles(session.getEffectiveUserName());
+if ( @IsMember("[wDebug]", v) )
+	true;
+else
+	false;
+	}]]></xp:this.rendered>
+		<xp:text escape="true" id="sys_appr_ip">
+			<xp:this.value><![CDATA[#{javascript:var pfdoc:NotesDocument = database.getProfileDocument("Profile", "");
+//var IP=pfdoc.getItemValueString("Ser_IP_List");
+var IP2=pfdoc.getItemValue("Ser_IP_List");
+var u_ip=getComponent("u_ip").value;
+var IsDebugMode = pfdoc.getItemValueString("IsDebugMode");
+var result = "0";
+//print("IsDebugMode："+IsDebugMode)
+
+if(IsDebugMode=="0"){
+	var vi = IP2.iterator();
+	while (vi.hasNext()) {
+		var tip = vi.next();
+		//print(tip);
+		if( u_ip==tip){
+			result = "1";
+			break;
+		}
+	}
+}else{
+	result = "1";
+}
+
+return result;
+}]]></xp:this.value>
+		</xp:text>
+		&#160;<xp:br></xp:br>
+
+		111
+		<xc:zz_sys_mdg></xc:zz_sys_mdg>
+	</xp:panel>
+	<xp:panel rendered="false">
+		開發筆記
+		<xp:label value="#{javascript:sessionScope.empID}"
+			id="label1">
+		</xp:label>
+		<xp:br></xp:br>
+		1. 欄位：帳號、密碼、工號、有無NotesID -&gt; 有則轉址帶帳號密碼轉址到 xxx&#160;page
+		<xp:br></xp:br>
+		&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;-&gt;
+		無則輸入工號，檢驗帳號密碼(自製AP)，帳密無誤轉址到 xxx page
+		<xp:br></xp:br>
+		2.&#160;
+	</xp:panel>
+	<xp:panel rendered="false">
+
+
+		<xp:br></xp:br>
+	</xp:panel>
+
+	<xp:eventHandler event="onClientLoad" submit="true"
+		refreshMode="partial" refreshId="panel_captcha">
+		<xp:this.script><![CDATA[
+//
+
+window.onload = function(){
+    setTimeout(function(){
+        window.scrollTo(0, 1);
+    }, 100);
+}
+
+]]></xp:this.script>
+		<xp:this.action><![CDATA[#{javascript://set_ss_ree("label_captcha");
+//下方為驗證圖形 暫不用
+set_ss_ree_img("label_captcha_img");}]]></xp:this.action>
+	</xp:eventHandler>
+	<xe:applicationLayout id="applicationLayout1">
+		<xp:this.facets>
+			<xp:panel xp:key="MastFooter"></xp:panel>
+
+
+		</xp:this.facets>
+		<xp:panel>
+
+			<xp:panel id="panel_off">
+				<xp:this.rendered><![CDATA[#{javascript:var s = getComponent("label_errmsg").value;
+
+if(s==""){
+	return false;
+}else{
+	return true;
+}}]]></xp:this.rendered>
+				<xp:text escape="false" id="computedField2"
+					style="color:rgb(255,0,0);font-size:18pt">
+					<xp:this.value><![CDATA[#{javascript:getComponent("label_errmsg").value;}]]></xp:this.value>
+				</xp:text>
+			</xp:panel>
+
+			<xp:panel id="panel_on">
+
+				<div id="loginbox" style="margin-top:20px;"
+					class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<div class="panel-title">
+								<xp:label value="登入" id="label8"></xp:label>
+							</div>
+						</div>
+
+						<div style="padding-top:10px"
+							class="panel-body">
+							<div class="form-horizontal">
+								<div style="margin-bottom: 15px"
+									class="input-group">
+									<div class="row">
+										<div class="col-sm-9">
+
+											<xp:label value="登入類別："
+												id="label2" rendered="false">
+											</xp:label>
+										</div>
+										<div class="col-sm-9"
+											style="display:none">
+											<div class="btn-group"
+												data-toggle="buttons">
+
+												<label
+													class="btn btn-default active">
+													<input type="radio"
+														id="q160" name="quality25" checked="checked" value="N" />
+													無 Notes ID
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div style="margin-bottom: 20px"
+									class="input-group">
+									<span class="input-group-addon"
+										id="basic-addon1">
+										<xp:label value="帳號："
+											id="label9">
+										</xp:label>
+									</span>
+									<xp:inputText id="u_username"
+										autocomplete="off" styleClass="form-control">
+										<xp:this.attrs>
+											<xp:attr name="placeholder"
+												value="請輸入您帳號">
+											</xp:attr>
+										</xp:this.attrs>
+										<xp:eventHandler
+											event="onchange" submit="true" refreshMode="partial"
+											refreshId="computedField1">
+										</xp:eventHandler>
+										<xp:eventHandler
+											event="onmouseout" submit="true" refreshMode="partial"
+											refreshId="computedField1">
+										</xp:eventHandler>
+										<xp:eventHandler event="onblur"
+											submit="true" refreshMode="partial" refreshId="computedField1">
+										</xp:eventHandler></xp:inputText>
+								</div>
+
+								
+								<div style="margin-bottom: 15px"
+									class="input-group">
+									<span class="input-group-addon"
+										id="span2">
+										<xp:label value="密碼："
+											id="label4">
+										</xp:label>
+									</span>
+									<xp:inputText id="u_password"
+										password="true" autocomplete="off">
+										<xp:this.attrs>
+											<xp:attr name="placeholder"
+												value="請輸入您的密碼">
+											</xp:attr>
+										</xp:this.attrs>
+										<xp:eventHandler
+											event="onkeypress" submit="false">
+											<xp:this.script><![CDATA[if (typeof thisEvent == 'undefined' && window.event) { thisEvent = window.event; }
+if (thisEvent.keyCode == 13)
+{
+	//alert("123");
+    document.getElementById("#{id:button_login}").click();
+}]]></xp:this.script>
+										</xp:eventHandler>
+										<xp:eventHandler
+											event="onmouseout" submit="true" refreshMode="partial"
+											refreshId="computedField1">
+										</xp:eventHandler>
+										<xp:eventHandler event="onblur"
+											submit="true" refreshMode="partial"
+											refreshId="computedField1">
+										</xp:eventHandler>
+										<xp:eventHandler
+											event="onchange" submit="true" refreshMode="partial"
+											refreshId="computedField1">
+										</xp:eventHandler>
+									</xp:inputText>
+									
+								</div>
+								<xp:label value="密碼 英文有區分大小寫，需一致"
+										id="label10" style="color:rgb(255,0,0)">
+								</xp:label>
+								
+								<xp:br></xp:br>
+								<xp:panel id="panel_captcha">
+									<xp:br></xp:br>
+									<div style="margin-bottom: 0px">
+										<span
+											class="input-group-addon1">
+											<xp:label value="驗證碼："
+												id="label3">
+												<xp:eventHandler
+													event="onclick" submit="true" refreshMode="partial"
+													refreshId="label_captcha">
+													<xp:this.action><![CDATA[#{javascript:ss_ree();
+//set_ss_ree("label_captcha");
+set_ss_ree_img("label_captcha_img");}]]></xp:this.action>
+												</xp:eventHandler>
+											</xp:label>
+										</span>
+										<xp:label id="label_captcha">
+											<xp:this.value><![CDATA[#{javascript:""}]]></xp:this.value>
+										</xp:label>
+										<xp:text escape="false"
+											id="label_captcha_img">
+											<xp:this.value><![CDATA[#{javascript://驗證圖形 暫不用
+""}]]></xp:this.value>
+										</xp:text>
+										<xp:br></xp:br>
+									</div>
+
+									<div style="margin-bottom: 15px"
+										class="input-group">
+										<span class="input-group-addon"
+											id="span3">
+											<xp:label value="驗證碼："
+												id="label6">
+											</xp:label>
+										</span>
+										<xp:inputText
+											id="inputText_captcha" autocomplete="off">
+											<xp:this.attrs>
+												<xp:attr
+													name="placeholder" value="請輸入上方驗證碼">
+												</xp:attr>
+											</xp:this.attrs>
+											<xp:eventHandler
+												event="onkeypress" submit="false">
+												<xp:this.script><![CDATA[if (typeof thisEvent == 'undefined' && window.event) { thisEvent = window.event; }
+
+if (thisEvent.keyCode == 13)
+{
+    document.getElementById("#{id:button_login}").click();
+}]]></xp:this.script>
+											</xp:eventHandler>
+										</xp:inputText>
+										
+									</div>
+								</xp:panel>
+								<xp:div style="text-align:center">
+									<xp:text escape="true"
+										id="computedField1"
+										style="color:rgb(255,0,0);text-align:center;font-family:sans-serif;font-size:16pt">
+										<xp:this.value><![CDATA[#{javascript:var tmpUsername=getComponent("u_username").value;
+var empID=tmpUsername;		//"00476";
+
+if (empID==null || empID==""){
+
+}else{
+
+	var syspfv:NotesView = database.getView("sys_profile");
+		//print(syspfv.getName());
+	var serN = @Name("[CN]",@Subset(@DbName(),1));
+		//print("serN:"+serN);
+	var pfdoc:NotesDocument = syspfv.getDocumentByKey(serN,true);
+	/*========== 取得個人文件 =========*/
+	var db:NotesDatabase = session.getDatabase(pfdoc.getItemValueString("APServ_01"), pfdoc.getItemValueString("APPath_01"), false);
+	if (db == null) {
+		 return "No Database";
+	} else {
+		 //print ("DB --> "+db.getTitle());
+	}
+	var v:NotesView = db.getView("(byuName)");
+	//print ( "View Name:" + v.getName());
+	//print ( "empID1:" + empID );
+	if (empID==null || empID==""){
+
+	}else{
+		var doc:NotesDocument = v.getDocumentByKey(empID);
+		//print ( "empID2:" + empID );
+		if (doc == null) {
+			errs="無此帳號,請諮詢人資。";
+			//view.postScript("alert('"+errs+"');");
+			return errs;
+			//return false;
+		}
+		
+		var login_AcconLockFlag=doc.getItemValueInteger("login_AcconLockFlag"); //工號鎖定旗標
+		if (login_AcconLockFlag>=1){
+			errs="您帳號已鎖定無法使用,將在24小時後解鎖,或請諮詢人資解鎖。";
+			//view.postScript("alert('"+errs+"');");
+			return errs;
+			//return false;
+		}
+		var errLoginCount=doc.getItemValueInteger("login_errCount");	//錯誤紀錄
+		if (errLoginCount>=5){
+			errs="您登入錯誤已超過5次,將在24小時後解鎖,或請諮詢人資解鎖。";
+			//view.postScript("alert('"+errs+"');");
+			return errs;
+			//return false;
+		}else{
+			if (errLoginCount>0){
+				errs="目前您已登入錯誤已超過"+errLoginCount+"次。";
+				//view.postScript("alert('"+errs+"');");
+				return errs;
+				//return false;
+			}
+		}
+	}	
+
+}
+
+
+
+
+
+
+
+	
+	}]]></xp:this.value>
+									</xp:text>
+								</xp:div>
+								<div style="margin-top:10px"
+									class="form-group"><!-- Button -->
+									<div class="col-sm-12 controls">
+										<xp:button value="登入"
+											id="button_login" styleClass="btn btn-success">
+											<xp:eventHandler
+												event="onclick" submit="true" refreshMode="complete">
+												<xp:this.action><![CDATA[#{javascript:try {
+	/*==========驗證碼區塊==========*/
+	var tmptotal=@Text(sessionScope.var1)+@Text(sessionScope.var2);
+	//print("tmptotal-->"+tmptotal);
+print("01-->");	
+	var tmpucode = getComponent("inputText_captcha").value;
+	//view.postScript("alert('"+tmpucode+"');");
+	
+	if(tmptotal==tmpucode){
+		//view.postScript("alert('輸入正確');");
+	}else{
+		view.postScript("alert('請輸入正確之驗證碼');");
+		ss_ree();
+		//set_ss_ree("label_captcha");	
+		set_ss_ree_img("label_captcha_img");
+		//view.postScript("document.getElementById('inputText_captcha').value=\"\";");
+		view.postScript("XSP.getElementById('view:_id1:inputText_captcha').value='';");
+		//view.postScript("$('#inputText_captcha').html(\"\");");
+		return false;
+	}
+	/*==========驗證碼區塊==========*/
+print("02-->");		
+	var cgi = new CGIVariables();
+	var errs="";
+	
+	var nid=getComponent("NID").value;
+	//print("nid:"+nid);
+	var tmpUsername=getComponent("u_username").value;
+	//print("tmpUsername:"+tmpUsername);
+	var tmpHttpPWD=getComponent("u_password").value;
+	tmpHttpPWD = session.evaluate("@Password(\""+tmpHttpPWD+"\")");
+	//print("tmpHttpPWD1:"+tmpHttpPWD1[0]);
+	//var tmpEMPID=getComponent("u_empid").value;
+	//取得輸入的個人代碼
+//	var tmpucode = getComponent("ucode").value;
+//	tmpucode = session.evaluate("@Password(\""+getComponent("ucode").value+"\")");
+	var url=@LeftBack(context.getUrl().getAddress(),".nsf")+".nsf";
+	var rdurl = @LeftBack(url,@RightBack(url,"/"))+"app_home.nsf";
+print("03-->");		
+	if (nid=="Y"){
+	//轉正常登入
+		tmpRDir=url+"?login&username="+tmpUsername+"&password="+tmpHttpPWD+"&RedirectTo="+rdurl;
+		//print("tmpRDir:"+tmpRDir);
+		sessionScope.empID=tmpEMPID;
+	
+		facesContext.getExternalContext().redirect( tmpRDir );
+		/*print ("sessionScope:"+sessionScope.empID);*/
+	} else {
+	//判斷帳號密碼
+print("04-->");	
+		//var pfdoc:NotesDocument = database.getProfileDocument("Profile", "");
+		var syspfv:NotesView = database.getView("sys_profile");
+			//print(syspfv.getName());
+		var serN = @Name("[CN]",@Subset(@DbName(),1));
+			//print("serN:"+serN);
+		var pfdoc:NotesDocument = syspfv.getDocumentByKey(serN,true);
+		/*========== 取得個人文件 =========*/
+		//print(pfdoc.getItemValueString("APServ_01"));
+		var db:NotesDatabase = session.getDatabase(pfdoc.getItemValueString("APServ_01"), pfdoc.getItemValueString("APPath_01"), false);
+		if (db == null) {
+			 return "No Database";
+		}
+		var v:NotesView = db.getView("(byuName)");
+		//print ( "View Name:" + v.getName());
+		var empID=tmpUsername;		//"00476";
+		//print ( "empID1:" + empID );
+		var doc:NotesDocument = v.getDocumentByKey(empID);
+		//print ( "empID2:" + empID );
+		if (doc == null) {
+			errs="無此帳號,請諮詢人資。";
+			view.postScript("alert('"+errs+"');");
+			return false;
+		}else{
+print("05-->");			
+		}
+		var login_AcconLockFlag=doc.getItemValueInteger("login_AcconLockFlag"); //工號鎖定旗標
+		if (login_AcconLockFlag>=1){
+			errs="您帳號已鎖定無法使用,將在24小時後解鎖,或請諮詢人資解鎖。";
+			view.postScript("alert('"+errs+"');");
+			return false;
+		}
+		
+		var errLoginCount=doc.getItemValueInteger("login_errCount");	//錯誤紀錄
+		if (errLoginCount>=5){
+			errs="您登入錯誤已超過5次,將在24小時後解鎖,或請諮詢人資解鎖。";
+			view.postScript("alert('"+errs+"');");
+			return false;
+		}
+print("06-->");				
+		var neuser = doc.getItemValueString("u_name");	//帳號之帳號
+		var nepws = doc.getItemValueString("u_pwd_code");	//帳號之編碼密碼
+		var neid = doc.getItemValueString("u_empID");	//帳號之工號
+		var tmpEMPID = doc.getItemValueString("u_empID");	//帳號之工號
+		var perCode = doc.getItemValueString("u_ucode"); //個人代碼
+	
+		errs="";
+		if (neuser=="" || !neuser.equals(tmpUsername)){
+			errs="輸入帳號與系統資料不符";
+			view.postScript("alert('"+errs+"');");
+			return false;
+		}
+
+print("07-->");	
+		if (nepws=="" || !nepws.equals(tmpHttpPWD[0])){
+			var agent:NotesAgent = db.getAgent("($.00.s.001)");
+			//print("agent --> "+agent.getName())
+			if (agent == null) {
+				return "No such agent ($.00.s.001)";
+			} else {
+				agent.runWithDocumentContext(doc);	//記錄登入錯誤
+			}
+			errLoginCount=doc.getItemValueInteger("login_errCount");	//錯誤紀錄
+			errs="輸入密碼與系統資料不符，已錯誤"+errLoginCount+"次";
+			view.postScript("alert('"+errs+"');");
+			if (errLoginCount>=5){
+				errs="您登入錯誤已超過5次,將在24小時後解鎖,或請諮詢人資解鎖。";
+				view.postScript("alert('"+errs+"');");
+				return false;
+			}
+			return false;
+		}
+	
+		if (errs!="") {
+			view.postScript("alert('"+errs+"');");
+			return false;
+		}else{
+			//抓個人對應之Notes帳號密碼
+			pubid=pfdoc.getItemValueString("sys_acc");
+			pwd=pfdoc.getItemValueString("sys_pa");
+			
+			//未變更預設密碼者  轉到設定畫面
+			var loginFlag=true;
+			var defPWFlag=doc.getItemValueString("defPWFlag");
+			if (defPWFlag=="") {
+				loginFlag=false;
+				sessionScope.loginFlag=false;
+			}
+			
+print("08-->");	
+//			if(tmpHttpPWD==pfdoc.getItemValueString("def_pw")){
+//				loginFlag=false;
+//				sessionScope.loginFlag=false;
+//				errs="請先變更預設密碼";
+//				view.postScript("alert('"+errs+"');");
+//			}
+			
+			//print("errs-->"+errs);print("loginFlag-->"+loginFlag);
+			if (loginFlag==false){
+				//print("errLoginCount-->"+errLoginCount);
+				if (errLoginCount>0){
+					var agent:NotesAgent = db.getAgent("($.00.s.002)");
+					//print("agent --> "+agent.getName())
+					if (agent == null) {
+						return "No such agent ($.00.s.002)";
+					} else {
+						agent.runWithDocumentContext(doc);	//登入錯誤紀錄 歸零
+					}			
+				}
+	
+				//view.postScript("alert('轉址 設定代碼');");
+				var apPath=pfdoc.getItemValueString("APPath_01");
+				var empid=neid;
+				var serport=cgi.SERVER_PORT;
+				//print("serport："+serport);
+				var ssl=cgi.HTTPS;
+				//print("ssl："+ssl);
+				//rdurl = "../../"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid;
+				
+print("09-->");					
+				if (ssl=="ON"){
+					if(serport=="443"){
+						rdurl = ("https://"+cgi.SERVER_NAME+"/"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid);
+					}else{
+						rdurl = ("https://"+cgi.SERVER_NAME+":"+serport+"/"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid);
+					}				
+				}else if (serport!=80){
+					rdurl = ("http://"+cgi.SERVER_NAME+":"+serport+"/"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid);
+				
+				}else{
+					rdurl = ("http://"+cgi.SERVER_NAME+"/"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid);
+				
+				}
+				
+				/*
+				if (serport!=80){
+					rdurl = ("http://"+cgi.SERVER_NAME+":"+serport+"/"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid);
+				
+				}else{
+					rdurl = ("http://"+cgi.SERVER_NAME+"/"+@ReplaceSubstring(apPath,"\\","/")+"/xpg_APChangSetScope_changDefPW.xsp?"+empid);
+				
+				}*/
+				//print("rdurl->"+rdurl);
+				
+				//view.postScript("alert('轉址 "+rdurl+"');");
+				//tmpRDir=url+"?login&username="+pubid+"&password="+pwd+"&RedirectTo="+rdurl;
+				//tmpRDir="?login&username="+pubid+"&password="+pwd+"&RedirectTo="+rdurl;
+				tmpRDir="./?login&username="+pubid+"&password="+pwd+"&RedirectTo="+rdurl;
+				//view.postScript("alert('轉址 "+tmpRDir+"');");
+				print("tmpRDir 1:"+tmpRDir);
+				sessionScope.empID=tmpEMPID;
+					var sscop=sessionScope.empID;
+	var usern = @Name("[cn]",@UserName());
+	print ("sscop1:"+sscop);
+	print ("usern1:"+usern);
+				facesContext.getExternalContext().redirect( tmpRDir );
+			}else{
+			//轉址到APP 畫面
+print("10-->");	
+				//print("agent --> "+"轉址到APP 畫面");
+				if (errLoginCount>0){
+					var agent:NotesAgent = db.getAgent("($.00.s.002)");
+					//print("agent --> "+agent.getName())
+					if (agent == null) {
+						return "No such agent ($.00.s.002)";
+					} else {
+						agent.runWithDocumentContext(doc);	//登入錯誤紀錄 歸零
+					}			
+				}else{
+					//紀錄登入時間
+					var agent:NotesAgent = db.getAgent("($.00.s.003)");
+					if (agent == null) {
+						return "No such agent ($.00.s.003)";
+					} else {
+						agent.runWithDocumentContext(doc);	//登入錯誤紀錄 歸零
+					}	
+				}
+				//tmpRDir=url+"?login&username="+pubid+"&password="+pwd+"&RedirectTo="+rdurl;
+				//tmpRDir="./?login&username="+pubid+"&password="+pwd+"&RedirectTo="+rdurl;
+				tmpRDir="./?login&username="+pubid+"&password="+pwd+"&RedirectTo="+rdurl;
+				print("tmpRDir 2:"+tmpRDir);
+				sessionScope.empID=tmpEMPID;
+					var sscop=sessionScope.empID;
+	var usern = @Name("[cn]",@UserName());
+	print ("sscop2:"+sscop);
+	print ("usern2:"+usern);
+				facesContext.getExternalContext().redirect( tmpRDir );
+			}
+		}
+	}
+} catch(e) { 
+	print (""+e.message); 
+} }]]></xp:this.action>
+												<xp:this.script><![CDATA[var errs="";
+if (XSP.getElementById("#{id:u_username}").value=="") {
+	errs = errs+"請輸入帳號\n";
+}
+
+if (XSP.getElementById("#{id:u_password}").value=="") {
+	errs = errs+"請輸入密碼\n";
+}
+
+if (XSP.getElementById("#{id:inputText_captcha}").value=="") {
+	errs = errs+"請輸入驗證碼\n";
+}
+
+if (errs!="") {
+	alert(errs);
+	return false; 
+}else{
+	var result=null;
+	for(var i=0; i<document.forms[0].elements.length; i++){
+	    if(document.forms[0].elements[i].name=="quality25" ){
+	
+	        if(document.forms[0].elements[i].checked == true){
+	            result=document.forms[0].elements[i].value;
+	            break; //remove this if for check box groups and collect multiple values above instead
+	}}}
+	//alert(result); 
+	XSP.getElementById("#{id:NID}").value = result;
+}
+//alert("Test!!")
+
+]]></xp:this.script>
+											</xp:eventHandler>
+										</xp:button>
+
+
+
+
+										<xp:inputText id="NID"
+											style="visibility: collapse;">
+										</xp:inputText>
+
+										<div class="btn-group"
+											role="group" aria-label="Basic example">
+											<xp:button id="button2"
+												value="忘記密碼" styleClass="btn btn-danger">
+												<xp:eventHandler
+													event="onclick" submit="true" refreshMode="complete">
+													<xp:this.action><![CDATA[#{javascript:var url=@LeftBack(context.getUrl().getAddress(),".nsf")+".nsf";
+var rdurl = @LeftBack(url,@RightBack(url,"/"))+"HR-AP-03.nsf/x_02_f_perpwd.xsp";
+facesContext.getExternalContext().redirect( rdurl );}]]></xp:this.action>
+												</xp:eventHandler>
+											</xp:button>
+
+
+											<xp:button id="button3"
+												value="忘記個人代碼" styleClass="btn btn-danger" rendered="false">
+												<xp:eventHandler
+													event="onclick" submit="true" refreshMode="complete">
+													<xp:this.action><![CDATA[#{javascript:var url=@LeftBack(context.getUrl().getAddress(),".nsf")+".nsf";
+var rdurl = @LeftBack(url,@RightBack(url,"/"))+"HR-AP-03.nsf/x_01_f_percode.xsp";
+facesContext.getExternalContext().redirect( rdurl );}]]></xp:this.action>
+												</xp:eventHandler>
+											</xp:button>
+											<xp:button id="button1"
+												styleClass="btn btn-danger" value="內部設備變更密碼"
+												rendered="false">
+												<xp:eventHandler
+													event="onclick" submit="true" refreshMode="complete">
+													<xp:this.action><![CDATA[#{javascript:var url=@LeftBack(context.getUrl().getAddress(),".nsf")+".nsf";
+var rdurl = @LeftBack(url,@RightBack(url,"/"))+"HR-AP-03.nsf/x_10_intra_Function.xsp";
+facesContext.getExternalContext().redirect( rdurl );}]]></xp:this.action>
+												</xp:eventHandler>
+											</xp:button>
+										</div>
+
+
+
+
+										<xp:br></xp:br>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</xp:panel>
+
+			<xp:panel>
+
+				<xc:t_footer></xc:t_footer>
+			</xp:panel>
+		</xp:panel>
+		<xe:this.configuration>
+			<xe:bootstrapResponsiveConfiguration
+				productLogo="/foxlinklogo.png" productLogoHeight="98%"
+				productLogoWidth="98%">
+				<xe:this.placeBarActions>
+
+					<xe:pageTreeNode label="昆山廠區-操作教學"
+						page="/x_99_help.xsp" styleClass="btn btn-info">
+					</xe:pageTreeNode>
+					
+				</xe:this.placeBarActions>
+
+			</xe:bootstrapResponsiveConfiguration>
+		</xe:this.configuration>
+
+	</xe:applicationLayout>
+	
+	<xc:xx_serN></xc:xx_serN>
+
+</xp:view>
